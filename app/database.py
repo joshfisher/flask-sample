@@ -8,6 +8,19 @@ def init_app(app):
     app.cli.add_command(_init_db_command)
 
 
+def incr_difference_request_count(n: int) -> int:
+    """
+    Increment the request count for `n` and return the new value
+    """
+    with _get() as db:
+        query = "INSERT INTO difference_requests(id) VALUES(?) ON CONFLICT(id) DO UPDATE SET count=count+1;"
+        db.execute(query, (n,))
+
+        query = "SELECT count from difference_requests WHERE id=?"
+        cursor = db.execute(query, (n,))        
+        return cursor.fetchone()["count"]
+
+
 def _init():
     db = _get()
     with current_app.open_resource("schema.sql") as f:

@@ -63,8 +63,7 @@ def _difference():
 
     diff = (sum ** 2) - sqr_sum
 
-    cnt = _request_count.get(num, 0) + 1
-    _request_count[num] = cnt
+    cnt = database.incr_difference_request_count(num)
 
     return jsonify(
         {
