@@ -4,15 +4,9 @@ from . import database
 from .util import isnatural, fmt_date
 
 
-# Global request counter
-_request_count = {}
-
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
-def _reset_request_count():
-    global _request_count
-    _request_count = {}
     # Configuration
     app.config.from_mapping(
         DATABASE=os.path.join(app.instance_path, "app.sqlite"),
@@ -30,7 +24,6 @@ def _reset_request_count():
 
     # Configure routes
     app.add_url_rule("/difference", view_func=_difference)
-    app.before_first_request(_reset_request_count)
     
     # Initialize services
     database.init_app(app)
