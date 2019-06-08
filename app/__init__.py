@@ -1,20 +1,40 @@
+import os
 from flask import Flask, request, jsonify
+from . import database
 from .util import isnatural, fmt_date
 
 
 # Global request counter
 _request_count = {}
 
+def create_app(test_config=None):
+    app = Flask(__name__, instance_relative_config=True)
 
 def _reset_request_count():
     global _request_count
     _request_count = {}
+    # Configuration
+    app.config.from_mapping(
+        DATABASE=os.path.join(app.instance_path, "app.sqlite"),
+    )
+    if test_config is None:
+        app.config.from_pyfile('config.py', silent=True)
+    else:
+        app.config.from_mapping(test_config)
 
+    # Make sure instance dir exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
 
-def create_app():
-    app = Flask(__name__, instance_relative_config=True)
+    # Configure routes
     app.add_url_rule("/difference", view_func=_difference)
     app.before_first_request(_reset_request_count)
+    
+    # Initialize services
+    database.init_app(app)
+    
     return app
 
 

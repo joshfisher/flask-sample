@@ -1,16 +1,5 @@
-import os, sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-import pytest, json
-from app import create_app
-
-
-@pytest.fixture
-def client():
-    c = create_app()
-    yield c.test_client()
-
+import json
+from conftest import client
 
 def test_difference_input(client):
     resp = client.get("/difference")
